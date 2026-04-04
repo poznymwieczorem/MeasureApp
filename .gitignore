@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C rozszerzenia
+*.so
+
+# Środowisko lokalne i zmienne środowiskowe
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+
+# Logi
+*.log
+logs/
+
+# Testy i pokrycie kodu (coverage)
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# PyCharm / VS Code / Systemowe
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Celery (jeśli używasz)
+celerybeat-schedule
