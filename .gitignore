@@ -47,3 +47,6 @@ Thumbs.db
 
 # Celery (jeśli używasz)
 celerybeat-schedule
+
+# Media
+media/
