@@ -54,4 +54,8 @@ class AccessAndAuthenticationTest(TestCase):
             dash_response = self.client.get(reverse('dashboard'))
             self.assertEqual(dash_response.status_code, 302)  # Should redirect to login again
 
+        def test_root_redirects_to_login(self):
+            response = self.client.get('/')
+            self.assertRedirects(response, '/login/')
+
 # Create your tests here.
