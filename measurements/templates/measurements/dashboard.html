@@ -1,0 +1,26 @@
+<h3>Witaj, {{ user.username }}!</h3>
+<p>Oto Twoje ostatnie pomiary elektrochemiczne:</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Elektroda</th>
+            <th>Technika</th>
+            <th>Plik .DTA</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in measurements %}
+        <tr>
+            <td>{{ m.date_performed }}</td>
+            <td>{{ m.electrode.label }}</td>
+            <td>{{ m.technique }}</td>
+            <td><a href="{{ m.raw_file.url }}">Pobierz</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Brak pomiarów w bazie.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'logout' %}" class="btn btn-danger">Wyloguj</a>
