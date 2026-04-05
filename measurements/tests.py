@@ -46,4 +46,12 @@ class AccessAndAuthenticationTest(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'Dashboard')  # Assuming the dashboard template contains this text
 
+        def test_logout_process(self):
+            login = self.client.login(username = 'testuser', password = 'password123')
+            response = self.client.post(reverse('logout'))
+            self.assertEqual(response.status_code, 302)  # Redirect after logout
+
+            dash_response = self.client.get(reverse('dashboard'))
+            self.assertEqual(dash_response.status_code, 302)  # Should redirect to login again
+
 # Create your tests here.
