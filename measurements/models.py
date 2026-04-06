@@ -45,6 +45,7 @@ class Measurement(models.Model):
     electrode = models.ForeignKey(Electrode, on_delete=models.CASCADE, related_name='measurements')
     technique = models.CharField(max_length=5, choices=TECHNIQUES)
     date_performed = models.DateField("Measurement Date")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     # File
     raw_file = models.FileField("Raw Data .DTA", upload_to= "uploads/raw/%Y/%m/")
