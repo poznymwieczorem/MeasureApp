@@ -18,15 +18,40 @@ def process_dta_file(measurement_instance):
 
     # Find the section with data
     lines = content.splitlines()
-    data_start = 0
+    data_start = -1
     for i, line in enumerate(lines):
-        if "CURVER" in line and "TABLE" in line:
-            data_start = i + 3
-            break
+        if "CURVE" in line:
+            for j in range(i + 1, min(i + 10, len(lines))):
+                if "Pt" in lines[j] and "Vf" in lines[j]:
+                    data_start = j
+                    break
+            if data_start != -1: break
     
-    try:
-        df = pd.read_csv(io.StringIO("\n".join(lines[data_start:])), sep='\t')
+    if data_start == -1:
+        print("Data section not found in the .dta file.")
+        return
 
+    try:
+        df = pd.read_csv(
+            io.StringIO("\n".join(lines[data_start:])),
+            sep=None,
+            engine='python',
+            on_bad_lines='skip'
+        )
+
+        df.columns = [c.strip() for c in df.columns]
+
+        for col in ['Vf', 'Im']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+        
+        df = df.dropna(subset=['Vf', 'Im'])
+
+        if df.empty:
+            print("No valid data found after processing the .dta file.")
+            return
+
+        # Save processed CSV to the Measurement instance
         csv_buffer = io.StringIO()
         df.to_csv(csv_buffer, index=False)
         csv_content = ContentFile(csv_buffer.getvalue().encode('utf-8'))
@@ -36,11 +61,17 @@ def process_dta_file(measurement_instance):
 
         if 'Im' in df.columns and 'Vf' in df.columns:
 
-            peaks, _ = find_peaks(df['Im'], distance=20)
-            if len(peaks) > 0:
-                highest_peak_idx = peaks[np.argmax(df['Im'].iloc[peaks])]
-                measurement_instance.peak_potential = df['Vf'].iloc[highest_peak_idx]
-                measurement_instance.peak_current = df['Im'].iloc[highest_peak_idx]
+            peaks, _ = find_peaks(df['Im'], distance=20) # For TEST purposes, we set distance=1 to find all peaks. In production, this should be adjusted based on expected data characteristics.
 
+            if len(peaks) > 0:
+                
+                highest_idx = peaks[np.argmax(df['Im'].iloc[peaks])]
+                measurement_instance.peak_potelntial = df['Vf'].iloc[highest_idx]
+                measurement_instance.peak_current = df['Im'].iloc[highest_idx]
+            else:
+                
+                max_idx = df['Im'].idxmax()
+                measurement_instance.peak_potelntial = df['Vf'].loc[max_idx]
+                measurement_instance.peak_current = df['Im'].loc[max_idx]
     except Exception as e:
         print(f"Error processing file: {e}")

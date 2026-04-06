@@ -70,4 +70,4 @@ class Measurement(models.Model):
 
         if is_new and self.raw_file:
             process_dta_file(self)
-            super().save(update_fields=['csv_file', 'peak_potential', 'peak_current'])
+            super().save(update_fields=['csv_file', 'peak_potelntial', 'peak_current'])

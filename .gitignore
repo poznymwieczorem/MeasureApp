@@ -50,3 +50,10 @@ celerybeat-schedule
 
 # Media
 media/
+
+# Pliki tymczasowe
+*.tmp
+*.temp
+
+# Pliki z danymi testowymi
+uploads/
