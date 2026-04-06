@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 
+from .utils import process_dta_file
+
 class Project(models.Model):
     name = models.CharField("Project Name", max_length=200)
     description = models.TextField("Project Description", blank=True)
@@ -60,3 +62,12 @@ class Measurement(models.Model):
     
     def __str__(self):
         return f"{self.technique} on {self.electrode.label} ({self.date_performed})"
+    
+    def save(self, *args, **kwargs):
+
+        is_new = self._state.adding
+        super().save(*args, **kwargs)
+
+        if is_new and self.raw_file:
+            process_dta_file(self)
+            super().save(update_fields=['csv_file', 'peak_potential', 'peak_current'])
