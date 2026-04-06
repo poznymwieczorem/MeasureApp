@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
     path('', views.dashboard, name="dashboard"),
     path('project/<int:pk>/', views.project_detail, name="project_detail"),
-    #path('measurement/<int:pk>/', views.measurement_detail, name='measurement_detail'),
+    path('measurement/<int:pk>/', views.measurement_detail, name='measurement_detail'),
+    path('api/calendar/', views.calendar_data, name='calendar_api'),
 ]

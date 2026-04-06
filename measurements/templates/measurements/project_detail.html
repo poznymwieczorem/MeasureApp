@@ -60,7 +60,7 @@
                                     <td>{{ m.peak_potelntial|floatformat:3|default:"-" }}</td>
                                     <td>{{ m.peak_current|scientific }} A</td>
                                     <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <a href="{% url 'measurement_detail' m.id %}" class="btn btn-sm btn-outline-primary">
                                             <i data-lucide="trending-up" style="width:14px"></i> Wykres
                                         </a>
                                     </td>

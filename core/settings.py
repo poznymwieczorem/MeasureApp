@@ -25,7 +25,15 @@ SECRET_KEY = 'django-insecure-uwc-lvp0bf=11p%#mn=zc9w6i3!ly+$=v3=j5l03ayi))ljp40
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'dioptric-interferingly-wilmer.ngrok-free.dev', 
+    '127.0.0.1', 
+    'localhost'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://dioptric-interferingly-wilmer.ngrok-free.dev',
+]
 
 
 # Application definition
