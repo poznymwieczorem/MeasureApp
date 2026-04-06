@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta
@@ -24,3 +24,11 @@ def dashboard(request):
     }
     return render(request, 'measurements/dashboard.html', context)
 
+def project_detail(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+
+    electrodes = Electrode.objects.filter(biomarker__project=project).prefetch_related('measurements')
+    return render(request, 'measurements/project_detail.html', {
+        'project': project,
+        'electrodes': electrodes,
+    })

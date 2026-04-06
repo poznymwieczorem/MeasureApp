@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ElectroLab OS</title>
+    <title>Let's Measure</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -19,7 +19,7 @@
     <nav class="navbar navbar-expand-lg sticky-top mb-4">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center fw-bold text-primary" href="{% url 'dashboard' %}">
-                <i data-lucide="zap" class="me-2"></i> ElectroLab
+                <i data-lucide="zap" class="me-2"></i> MaeasurementLapp
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -30,7 +30,10 @@
                         <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Projekty</a>
+                        <a class="nav-link" href="{% url 'dashboard' %}">Projekty</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">Pomiar</a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
