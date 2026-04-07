@@ -1,0 +1,3 @@
+Witaj {{ user.username }},
+Kliknij w poniższy link, aby aktywować konto w systemie MeasureLapp:
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_recaptcha',
     'measurements',
 ]
 
@@ -116,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
@@ -130,3 +131,14 @@ STATIC_URL = 'static/'
 
 LOGIN_REDIRECT_URL = '/measurements/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+RECAPTCHA_PUBLIC_KEY = '6LcnTKosAAAAADxtjqnZhTNb1U8pCgHF733NsGQ0'
+RECAPTCHA_PRIVATE_KEY = '6LcnTKosAAAAALpFqjQeku2YYTmHps4sVmFsSCLX'
+
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Do testów można użyć konsoli, ale w produkcji trzeba skonfigurować prawdziwy backend
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'twoj-mail@gmail.com'
+# EMAIL_HOST_PASSWORD = 'haslo-aplikacji-google' # To nie jest Twoje hasło do maila!
