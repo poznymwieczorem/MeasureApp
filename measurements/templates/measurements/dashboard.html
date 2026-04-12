@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">Witaj w Laboratorium</h2>
-    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createStructureModal">
         <i data-lucide="plus-circle" class="me-1"></i> Nowy Projekt
     </button>
 </div>
@@ -83,7 +83,7 @@
     </script>
 </div>
 
-<div class="modal fade" id="uploadModal" tabindex="-1">
+<!-- <div class="modal fade" id="uploadModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header">
@@ -111,6 +111,84 @@
                     <button type="submit" class="btn btn-primary px-4 rounded-pill">Rozpocznij Analizę</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div> -->
+
+<div class="modal fade" id="createStructureModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Nowy projekt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="post" action="{% url 'create_structure' %}">
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                    <!-- PROJEKT -->
+                    <div class="mb-2">
+                        <div class="text-muted small fw-bold mb-2">PROJEKT</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small d-block mb-1">
+                            Nazwa projektu
+                        </label>
+                        {{ project_form.name }}
+                    </div>
+
+                    <div class="mb-3" style="max-width: 400px;">
+                        <label class="form-label small d-block mb-1">
+                            Opis projektu
+                        </label>
+                        {{ project_form.description }}
+                    </div>
+
+                    <!-- BIOMARKER -->
+                    <div class="mb-2">
+                        <div class="text-muted small fw-bold mb-2">BIOMARKER</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small d-block mb-1">
+                            Nazwa biomarkera
+                        </label>
+                        {{ biomarker_form.name }}
+                    </div>
+
+                    <!-- ELEKTRODA -->
+                    <div class="mb-2">
+                        <div class="text-muted small fw-bold mb-2">ELEKTRODA</div>
+
+                        <div class="mb-3">
+                            <label class="form-label small d-block mb-1">
+                                Nazwa elektrody
+                            </label>
+                            {{ electrode_form.label }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small d-block mb-1">
+                                Materiał elektrody <span class="text-muted">(opcjonalnie)</span>
+                            </label>
+                            {{ electrode_form.material }}
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            Anuluj
+                        </button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            Zapisz
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
         </div>
     </div>
 </div>

@@ -11,7 +11,7 @@ from .models import Project, Measurement, Electrode
 
 # libraries for registering new users and captcha
 from django.contrib import messages
-from .forms import RegisterForm
+from .forms import RegisterForm, ProjectForm, BiomarkerForm, ElectrodeForm
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_str
@@ -30,11 +30,18 @@ def dashboard(request):
 
     all_electrodes = Electrode.objects.filter(biomarker__project__in=user_projects)
 
+    project_form = ProjectForm(prefix="project")
+    biomarker_form = BiomarkerForm(prefix="biomarker")
+    electrode_form = ElectrodeForm(prefix="electrode")
+
     context = {
         'projects': user_projects,
         'total_measurements': total_m,
         'recent_count': recent_m,
         'all_electrodes': all_electrodes,
+        'project_form': project_form,
+        'biomarker_form': biomarker_form,
+        'electrode_form': electrode_form,
     }
     return render(request, 'measurements/dashboard.html', context)
 
@@ -140,3 +147,30 @@ def activate(request, uidb64, token):
         return redirect('login')
     else:
         return render(request, 'registration/activation_invalid.html')
+    
+@login_required
+def create_structure(request):
+    if request.method == "POST":
+
+        project_form = ProjectForm(request.POST, prefix="project")
+        biomarker_form = BiomarkerForm(request.POST, prefix="biomarker")
+        electrode_form = ElectrodeForm(request.POST, prefix="electrode")
+
+        if all([
+            project_form.is_valid(),
+            biomarker_form.is_valid(),
+            electrode_form.is_valid()
+        ]):
+
+            project = project_form.save()
+            project.members.add(request.user)
+
+            biomarker = biomarker_form.save(commit=False)
+            biomarker.project = project
+            biomarker.save()
+
+            electrode = electrode_form.save(commit=False)
+            electrode.biomarker = biomarker
+            electrode.save()
+
+    return redirect("dashboard")
