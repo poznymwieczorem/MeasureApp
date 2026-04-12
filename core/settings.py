@@ -76,10 +76,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'measureapp',
-        'USER': 'measure_user',
-        'PASSWORD': 'adminadmin',
-        'HOST': '127.0.0.1',
+        'NAME': 'twoja_baza',
+        'USER': 'michalmetel',
+        'PASSWORD': '12345678',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
