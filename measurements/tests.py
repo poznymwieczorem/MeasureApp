@@ -130,6 +130,64 @@ class ParserTest(TestCase):
         self.assertIsNone(measurement.peak_potelntial)
         self.assertIsNone(measurement.peak_current)
 
-        
+class CreateStructureTest(TestCase):
 
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            password="1234"
+        )
+        self.client.login(username="testuser", password="1234")
+
+    def test_create_full_structure(self):
+        response = self.client.post(
+            reverse("create_structure"),
+            {
+                "project-name": "Projekt X",
+                "project-description": "Opis testowy",
+                "biomarker-name": "Glukoza",
+                "electrode-label": "E1",
+                "electrode-material": "Au",
+            }
+        )
+
+        # 🔹 redirect
+        self.assertEqual(response.status_code, 302)
+
+        # 🔹 project
+        self.assertEqual(Project.objects.count(), 1)
+        project = Project.objects.first()
+        self.assertEqual(project.name, "Projekt X")
+
+        # 🔹 membership
+        self.assertIn(self.user, project.members.all())
+
+        # 🔹 biomarker
+        self.assertEqual(Biomarker.objects.count(), 1)
+        biomarker = Biomarker.objects.first()
+        self.assertEqual(biomarker.name, "Glukoza")
+        self.assertEqual(biomarker.project, project)
+
+        # 🔹 electrode
+        self.assertEqual(Electrode.objects.count(), 1)
+        electrode = Electrode.objects.first()
+        self.assertEqual(electrode.label, "E1")
+        self.assertEqual(electrode.biomarker, biomarker)        
+
+def test_invalid_form(self):
+    response = self.client.post(
+        reverse("create_structure"),
+        {
+            "project-name": "",  # brak nazwy
+        }
+    )
+
+    self.assertEqual(Project.objects.count(), 0)
+
+def test_requires_login(self):
+    self.client.logout()
+
+    response = self.client.post(reverse("create_structure"))
+
+    self.assertEqual(response.status_code, 302)  # redirect do login
 # Create your tests here.
