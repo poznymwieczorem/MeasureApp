@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow p-5">
+                <i data-lucide="alert-octagon" class="text-danger mx-auto mb-4" style="width: 64px; height: 64px;"></i>
+                <h2 class="fw-bold">Link wygasł lub jest nieprawidłowy</h2>
+                <p class="text-muted">Niestety ten link aktywacyjny nie jest już ważny. Może Twoje konto zostało już aktywowane?</p>
+                <a href="{% url 'login' %}" class="btn btn-primary rounded-pill px-4">Przejdź do logowania</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>lucide.createIcons();</script>
+{% endblock %}

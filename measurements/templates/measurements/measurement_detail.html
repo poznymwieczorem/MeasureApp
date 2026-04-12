@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load electro_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'project_detail' measurement.electrode.biomarker.project.id %}">{{ measurement.electrode.biomarker.project.name }}</a></li>
+            <li class="breadcrumb-item active">Pomiar #{{ measurement.id }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Metadane Badania</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Technika:</span> <strong>{{ measurement.technique }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Elektroda:</span> <strong>{{ measurement.electrode.label }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Data pomiaru:</span> <strong>{{ measurement.date_performed }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-primary mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold text-primary mb-3"><i data-lucide="target" class="me-2"></i>Wyniki Analizy</h5>
+                    <div class="mb-2 small text-muted">POTENCJAŁ PIKU (Ep)</div>
+                    <div class="h4 fw-bold text-dark">{{ measurement.peak_potential|floatformat:4 }} V</div>
+                    <hr>
+                    <div class="mb-2 small text-muted">NATĘŻENIE PIKU (Ip)</div>
+                    <div class="h4 fw-bold text-dark">{{ measurement.peak_current|scientific }} A</div>
+                </div>
+            </div>
+            
+            <a href="{{ measurement.raw_file.url }}" class="btn btn-outline-secondary w-100 mb-2">
+                <i data-lucide="download" class="me-2" style="width:16px"></i> Pobierz .DTA (Raw)
+            </a>
+            {% if measurement.csv_file %}
+            <a href="{{ measurement.csv_file.url }}" class="btn btn-success w-100">
+                <i data-lucide="file-spreadsheet" class="me-2" style="width:16px"></i> Pobierz .CSV
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm p-3" style="min-height: 500px;">
+                {% if plot_div %}
+                    {{ plot_div|safe }}
+                {% else %}
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-center text-muted">
+                            <i data-lucide="alert-triangle" class="mb-2" style="width:48px; height:48px;"></i>
+                            <p>Brak danych do wyświetlenia wykresu. Sprawdź poprawność pliku .DTA.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

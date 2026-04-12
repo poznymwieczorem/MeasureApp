@@ -46,7 +46,7 @@ class AccessAndAuthenticationTest(TestCase):
             self.assertTrue(login)
             response = self.client.get(reverse('dashboard'))
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'Witaj, testuser!')  # Assuming the dashboard template contains this text
+            self.assertContains(response, '<h2 class="fw-bold">Witaj w Laboratorium</h2>')  # Assuming the dashboard template contains this text
 
     def test_logout_process(self):
             login = self.client.login(username = 'testuser', password = 'password123')
