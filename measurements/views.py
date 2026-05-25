@@ -7,7 +7,7 @@ from django.urls import reverse
 import plotly.express as px
 import pandas as pd
 
-from .models import Project, Measurement, Electrode
+from .models import Project, Measurement, Electrode, Biomarker 
 
 # libraries for registering new users and captcha
 from django.contrib import messages
@@ -54,6 +54,24 @@ def project_detail(request, pk):
         'project': project,
         'electrodes': electrodes,
     })
+
+# @login_required
+# def project_detail(request, pk):
+#     project = get_object_or_404(Project, pk=pk)
+
+#     electrode_biomarkers = (
+#         ElectrodeBiomarker.objects
+#         .filter(biomarker__project=project)
+#         .select_related("electrode", "biomarker")
+#         .prefetch_related("measurements")
+#         .annotate(measurements_count=count("measurements"))
+#         .order_by("electrode__label", "biomarker__name")
+#     )
+
+#     return render(request, 'measurements/project_detail.html', {
+#         'project': project,
+#         'electrode_biomarkers': electrode_biomarkers,
+#     })
 
 @login_required
 def calendar_data(request):

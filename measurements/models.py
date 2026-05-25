@@ -20,11 +20,11 @@ class Biomarker (models.Model):
     
     def __str__ (self):
         return F"{self.name} ({self.project.name})"
-    
+
 class Electrode(models.Model):
     label = models.CharField("Electrode Label", max_length=100)
     material = models.CharField("Electrode Material", max_length=100, blank=True)
-    biomarker = models.ForeignKey(Biomarker, on_delete=models.CASCADE, related_name='electrodes')
+    biomarker = models.ForeignKey(Biomarker, on_delete=models.CASCADE, related_name='electrodes', null=True)
 
     def __str__ (self):
         return self.label
