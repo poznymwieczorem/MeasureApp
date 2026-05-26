@@ -19,22 +19,46 @@ class RegisterForm(UserCreationForm):
             raise forms.ValidationError("Ten adres e-mail jest już zajęty.")
         return email
     
+# class ProjectForm(forms.ModelForm):
+#     class Meta:
+#         model = Project
+#         fields = ['name', 'description']
+#         labels = {
+#             'name': 'Nazwa projektu',
+#             'description': 'Opis projektu',
+#         }
+#         widgets = {
+#             'description': forms.Textarea(attrs={
+#                 'class': 'form-control',
+#                 'rows': 4,
+#                 'style': 'border: 1px solid black;',
+#             })
+#         }
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
+
         fields = ['name', 'description']
+
         labels = {
             'name': 'Nazwa projektu',
             'description': 'Opis projektu',
         }
+
         widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'style': 'border: 1px solid black;',
+            }),
+
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
                 'style': 'border: 1px solid black;',
             })
         }
-
+        
 class BiomarkerForm(forms.ModelForm):
     class Meta:
         model = Biomarker
