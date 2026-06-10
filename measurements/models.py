@@ -8,27 +8,31 @@ class Project(models.Model):
     name = models.CharField("Project Name", max_length=200)
     description = models.TextField("Project Description", blank=True)
     created_at = models.DateTimeField("Created At", auto_now_add=True)
-    # Optional: Add a user field to associate projects with users
     members = models.ManyToManyField(User, related_name='projects')
 
     def __str__(self):
         return self.name
 
-class Biomarker (models.Model):
+
+class Biomarker(models.Model):
     name = models.CharField("Biomarker Name", max_length=100)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='biomarkers')
-    
-    def __str__ (self):
-        return F"{self.name} ({self.project.name})"
+    # M2M: jeden biomarker może być w wielu projektach
+    projects = models.ManyToManyField(Project, related_name='biomarkers', blank=True)
+
+    def __str__(self):
+        return self.name
+
 
 class Electrode(models.Model):
     label = models.CharField("Electrode Label", max_length=100)
     material = models.CharField("Electrode Material", max_length=100, blank=True)
-    biomarker = models.ForeignKey(Biomarker, on_delete=models.CASCADE, related_name='electrodes', null=True)
+    # M2M: jedna elektroda może być w wielu projektach
+    projects = models.ManyToManyField(Project, related_name='electrodes', blank=True)
 
-    def __str__ (self):
+    def __str__(self):
         return self.label
-    
+
+
 class Measurement(models.Model):
     TECHNIQUES = [
         ('EIS', 'Electrochemical Impedance Spectroscopy'),
@@ -43,32 +47,32 @@ class Measurement(models.Model):
     ]
 
     electrode = models.ForeignKey(Electrode, on_delete=models.CASCADE, related_name='measurements')
+    biomarker = models.ForeignKey(Biomarker, on_delete=models.SET_NULL, null=True, blank=True, related_name='measurements')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='measurements', null=True)
     technique = models.CharField(max_length=5, choices=TECHNIQUES)
-    date_performed = models.DateField("Measurement Date")
+    # Zmiana 2: DateTimeField zamiast DateField
+    date_performed = models.DateTimeField("Measurement Date & Time")
     created_at = models.DateTimeField(auto_now_add=True)
 
     # File
-    raw_file = models.FileField("Raw Data .DTA", upload_to= "uploads/raw/%Y/%m/")
-    csv_file = models.FileField("Processed Data .CSV", upload_to= "uploads/csv/%Y/%m/", blank=True, null=True)
+    raw_file = models.FileField("Raw Data .DTA", upload_to="uploads/raw/%Y/%m/")
+    csv_file = models.FileField("Processed Data .CSV", upload_to="uploads/csv/%Y/%m/", blank=True, null=True)
 
-    # Results (automatic fields to be filled after processing the raw data)
+    # Results
     peak_potelntial = models.FloatField("Peak Potential (V)", blank=True, null=True)
     peak_current = models.FloatField("Peak Current (A)", blank=True, null=True)
-
     lod = models.FloatField("Limit of Detection (LOD)", blank=True, null=True)
     loq = models.FloatField("Limit of Quantification (LOQ)", blank=True, null=True)
 
     class Meta:
         ordering = ['-date_performed']
-    
+
     def __str__(self):
         return f"{self.technique} on {self.electrode.label} ({self.date_performed})"
-    
-    def save(self, *args, **kwargs):
 
+    def save(self, *args, **kwargs):
         is_new = self._state.adding
         super().save(*args, **kwargs)
-
         if is_new and self.raw_file:
             process_dta_file(self)
             super().save(update_fields=['csv_file', 'peak_potelntial', 'peak_current'])

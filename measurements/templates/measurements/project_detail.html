@@ -14,199 +14,282 @@
         <h2 class="fw-bold mb-0">{{ project.name }}</h2>
         <p class="text-muted">{{ project.description|default:"Brak opisu projektu." }}</p>
     </div>
-    <div class="btn-group">
-        <a href="{% url 'project_edit' project.id %}" class="btn btn-outline-primary"> 
-            <i data-lucide="edit-3" class="me-1" style="width:16px"></i> Edytuj </a>
+    <div class="d-flex gap-2 flex-wrap justify-content-end">
+        <a href="{% url 'export_project_csv' project.id %}" class="btn btn-outline-success">
+            <i data-lucide="download" class="me-1" style="width:16px"></i> Eksport CSV
+        </a>
+        <a href="{% url 'project_edit' project.id %}" class="btn btn-outline-primary">
+            <i data-lucide="edit-3" class="me-1" style="width:16px"></i> Edytuj
+        </a>
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addElectrodeModal">
+            <i data-lucide="zap" class="me-1" style="width:16px"></i> + Elektroda
+        </button>
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addBiomarkerModal">
+            <i data-lucide="flask-conical" class="me-1" style="width:16px"></i> + Biomarker
+        </button>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
             <i data-lucide="plus" class="me-1" style="width:16px"></i> Dodaj Pomiar
         </button>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <h4 class="fw-bold mb-3">Struktura Badań</h4>
-        <div class="accordion shadow-sm" id="projectAccordion">
-            {% for electrode in electrodes %}
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading{{ electrode.id }}">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ electrode.id }}">
-                        <div class="d-flex justify-content-between w-100 me-3">
-                            <span>
-                                <i data-lucide="layers" class="me-2 text-primary"></i>
-                                <strong>{{ electrode.label }}</strong> 
-                                <span class="badge bg-light text-dark ms-2">{{ electrode.biomarker.name }}</span>
-                            </span>
-                            <span class="text-muted small">{{ electrode.measurements.count }} pomiarów</span>
-                        </div>
-                    </button>
-                </h2>
-                <div id="collapse{{ electrode.id }}" class="accordion-collapse collapse" data-bs-parent="#projectAccordion">
-                    <div class="accordion-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Data</th>
-                                    <th>Metoda</th>
-                                    <th>Pik (V)</th>
-                                    <th>Prąd (A)</th>
-                                    <th class="text-end pe-4">Akcja</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for m in electrode.measurements.all %}
-                                <tr>
-                                    <td class="ps-4">{{ m.date_performed }}</td>
-                                    <td><span class="badge bg-info text-dark">{{ m.technique }}</span></td>
-                                    <td>{{ m.peak_potelntial|floatformat:3|default:"-" }}</td>
-                                    <td>{{ m.peak_current|scientific }} A</td>
-                                    <td class="text-end pe-4">
-                                        <a href="{% url 'measurement_detail' m.id %}" class="btn btn-sm btn-outline-primary">
-                                            <i data-lucide="trending-up" style="width:14px"></i> Wykres
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="5" class="text-center py-3 text-muted">Brak pomiarów dla tej elektrody.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<!-- Struktura projektu: elektrody i biomarkery -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-3">
+            <h6 class="fw-bold mb-2"><i data-lucide="zap" class="me-1" style="width:16px"></i>Elektrody projektu</h6>
+            {% for e in electrodes %}
+                <span class="badge bg-primary me-1 mb-1 d-inline-flex align-items-center gap-1">
+                    {{ e.label }}{% if e.material %} ({{ e.material }}){% endif %}
+                    <form method="post" action="{% url 'remove_electrode_from_project' project.id e.id %}" class="d-inline"
+                        onsubmit="return confirm('Usunąć elektrodę {{ e.label }} z projektu?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-close btn-close-white ms-1"
+                                style="font-size:0.6rem; opacity:0.8;"></button>
+                    </form>
+                </span>
             {% empty %}
-            <div class="alert alert-info">W tym projekcie nie ma jeszcze żadnych elektrod.</div>
+                <span class="text-muted small">Brak elektrod</span>
+            {% endfor %}
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm p-3">
+            <h6 class="fw-bold mb-2"><i data-lucide="flask-conical" class="me-1" style="width:16px"></i>Biomarkery projektu</h6>
+            {% for b in biomarkers %}
+                <span class="badge bg-success me-1 mb-1 d-inline-flex align-items-center gap-1">
+                    {{ b.name }}
+                    <form method="post" action="{% url 'remove_biomarker_from_project' project.id b.id %}" class="d-inline"
+                        onsubmit="return confirm('Usunąć biomarker {{ b.name }} z projektu?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-close btn-close-white ms-1"
+                                style="font-size:0.6rem; opacity:0.8;"></button>
+                    </form>
+                </span>
+            {% empty %}
+                <span class="text-muted small">Brak biomarkerów</span>
             {% endfor %}
         </div>
     </div>
 </div>
 
-<div class="modal fade"
-     id="uploadModal"
-     tabindex="-1">
+<!-- Zmiana 6: Wyszukiwanie -->
+<div class="card shadow-sm p-3 mb-4">
+    <h6 class="fw-bold mb-3"><i data-lucide="search" class="me-1" style="width:16px"></i>Filtruj pomiary</h6>
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold">Data od</label>
+            {{ search_form.date_from }}
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold">Data do</label>
+            {{ search_form.date_to }}
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">Elektroda</label>
+            {{ search_form.electrode }}
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">Biomarker</label>
+            {{ search_form.biomarker }}
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Filtruj</button>
+            <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary btn-sm w-100">Wyczyść</a>
+        </div>
+    </form>
+</div>
 
+<!-- Lista pomiarów -->
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Pomiary</span>
+        <small class="text-muted">{{ page_obj.paginator.count }} wyników</small>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Data i godzina</th>
+                    <th>Elektroda</th>
+                    <th>Biomarker</th>
+                    <th>Metoda</th>
+                    <th>Pik (V)</th>
+                    <th>Prąd (A)</th>
+                    <th class="text-end pe-4">Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in page_obj %}
+                <tr>
+                    <td class="ps-4">{{ m.date_performed|date:"d.m.Y H:i" }}</td>
+                    <td>{{ m.electrode.label }}</td>
+                    <td>{{ m.biomarker.name|default:"-" }}</td>
+                    <td><span class="badge bg-info text-dark">{{ m.technique }}</span></td>
+                    <td>{{ m.peak_potelntial|floatformat:3|default:"-" }}</td>
+                    <td>{{ m.peak_current|scientific }} A</td>
+                    <td class="text-end pe-4">
+                        <a href="{% url 'measurement_detail' m.id %}" class="btn btn-sm btn-outline-primary">
+                            <i data-lucide="trending-up" style="width:14px"></i> Wykres
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">Brak pomiarów spełniających kryteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Zmiana 5: Stronicowanie -->
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer d-flex justify-content-center">
+        <nav>
+            <ul class="pagination mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                        &laquo; Poprzednia
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">
+                        Następna &raquo;
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Dodaj pomiar -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-
-            <form method="post"
-                enctype="multipart/form-data"
-                action="{% url 'measurement_create' project.id %}">
-
+            <form method="post" enctype="multipart/form-data"
+                  action="{% url 'measurement_create' project.id %}">
                 {% csrf_token %}
-
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        Dodaj pomiar
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title">Dodaj pomiar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
-
                     <div class="mb-3">
-                        <label class="form-label">
-                            Elektroda
-                        </label>
-
-                        <select name="electrode"
-                                class="form-select"
-                                required>
-
-                            {% for electrode in electrodes %}
-                            <option value="{{ electrode.id }}">
-                                {{ electrode.label }}
-                            </option>
+                        <label class="form-label">Elektroda</label>
+                        <select name="electrode" class="form-select" required>
+                            {% for e in electrodes %}
+                            <option value="{{ e.id }}">{{ e.label }}</option>
                             {% endfor %}
-
                         </select>
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label">
-                            Technika
-                        </label>
-
-                        <select name="technique"
-                                class="form-select"
-                                required>
-
+                        <label class="form-label">Biomarker</label>
+                        <select name="biomarker" class="form-select">
+                            <option value="">-- Brak --</option>
+                            {% for b in biomarkers %}
+                            <option value="{{ b.id }}">{{ b.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Technika</label>
+                        <select name="technique" class="form-select" required>
                             {% for value, label in measurement_choices %}
-                            <option value="{{ value }}">
-                                {{ label }}
-                            </option>
+                            <option value="{{ value }}">{{ label }}</option>
                             {% endfor %}
-
                         </select>
                     </div>
-
+                    <!-- Zmiana 2: datetime-local zamiast date -->
                     <div class="mb-3">
-                        <label class="form-label">
-                            Data pomiaru
-                        </label>
-
-                        <input type="date"
-                               name="date_performed"
-                               class="form-control"
-                               required>
+                        <label class="form-label">Data i godzina pomiaru</label>
+                        <input type="datetime-local" name="date_performed"
+                               class="form-control" required>
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label">
-                            Plik .DTA
-                        </label>
-
-                        <input type="file"
-                            name="raw_file"
-                            class="form-control"
-                            accept=".dta"
-                            required>
+                        <label class="form-label">Plik .DTA</label>
+                        <input type="file" name="raw_file" class="form-control" accept=".dta" required>
                     </div>
-
                 </div>
-
                 <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
-                        Anuluj
-                    </button>
-
-                    <button type="submit"
-                            class="btn btn-primary">
-
-                        Dodaj pomiar
-                    </button>
-
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Dodaj pomiar</button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
 
-<form method="post">
-    {% csrf_token %}
-
-    <div class="mb-3">
-        {{ form.name.label_tag }}
-        {{ form.name }}
+<!-- Zmiana 7: Modal dodaj elektrodę -->
+<div class="modal fade" id="addElectrodeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'add_electrode_to_project' project.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj elektrodę do projektu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Etykieta elektrody</label>
+                        {{ electrode_form.label }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Materiał <span class="text-muted">(opcjonalnie)</span></label>
+                        {{ electrode_form.material }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Dodaj</button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        {{ form.description.label_tag }}
-        {{ form.description }}
+<!-- Zmiana 7: Modal dodaj biomarker -->
+<div class="modal fade" id="addBiomarkerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'add_biomarker_to_project' project.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj biomarker do projektu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nazwa biomarkera</label>
+                        {{ biomarker_form.name }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Dodaj</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <button type="submit" class="btn btn-primary">
-        Zapisz
-    </button>
-</form>
+</div>
 
 <script>lucide.createIcons();</script>
 {% endblock %}
