@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
-from .models import Project, Biomarker, Electrode
+from .models import Project, Biomarker, Electrode, Measurement
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True, help_text="Wymagany do weryfikacji konta.")
@@ -58,7 +58,7 @@ class ProjectForm(forms.ModelForm):
                 'style': 'border: 1px solid black;',
             })
         }
-        
+
 class BiomarkerForm(forms.ModelForm):
     class Meta:
         model = Biomarker
@@ -74,4 +74,28 @@ class ElectrodeForm(forms.ModelForm):
         labels = {
             'label': 'Etykieta elektrody',
             'material': 'Materiał elektrody (opcjonalnie)',
+        }
+
+class MeasurementForm(forms.ModelForm):
+    class Meta:
+        model = Measurement
+
+        fields = [
+            'electrode',
+            'technique',
+            'date_performed',
+            'raw_file',
+        ]
+
+        labels = {
+            'electrode': 'Elektroda',
+            'technique': 'Metoda pomiaru',
+            'date_performed': 'Data pomiaru',
+            'raw_file': 'Plik .DTA',
+        }
+
+        widgets = {
+            'date_performed': forms.DateInput(
+                attrs={'type': 'date'}
+            ),
         }

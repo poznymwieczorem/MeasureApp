@@ -58,7 +58,7 @@
                                 <tr>
                                     <td class="ps-4">{{ m.date_performed }}</td>
                                     <td><span class="badge bg-info text-dark">{{ m.technique }}</span></td>
-                                    <td>{{ m.peak_potential|floatformat:3|default:"-" }}</td>
+                                    <td>{{ m.peak_potelntial|floatformat:3|default:"-" }}</td>
                                     <td>{{ m.peak_current|scientific }} A</td>
                                     <td class="text-end pe-4">
                                         <a href="{% url 'measurement_detail' m.id %}" class="btn btn-sm btn-outline-primary">
@@ -77,6 +77,115 @@
             {% empty %}
             <div class="alert alert-info">W tym projekcie nie ma jeszcze żadnych elektrod.</div>
             {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="uploadModal"
+     tabindex="-1">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post"
+                enctype="multipart/form-data"
+                action="{% url 'measurement_create' project.id %}">
+
+                {% csrf_token %}
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Dodaj pomiar
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Elektroda
+                        </label>
+
+                        <select name="electrode"
+                                class="form-select"
+                                required>
+
+                            {% for electrode in electrodes %}
+                            <option value="{{ electrode.id }}">
+                                {{ electrode.label }}
+                            </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Technika
+                        </label>
+
+                        <select name="technique"
+                                class="form-select"
+                                required>
+
+                            {% for value, label in measurement_choices %}
+                            <option value="{{ value }}">
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Data pomiaru
+                        </label>
+
+                        <input type="date"
+                               name="date_performed"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Plik .DTA
+                        </label>
+
+                        <input type="file"
+                            name="raw_file"
+                            class="form-control"
+                            accept=".dta"
+                            required>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Anuluj
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Dodaj pomiar
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
     </div>
 </div>

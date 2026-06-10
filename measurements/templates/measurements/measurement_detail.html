@@ -34,16 +34,24 @@
                 <div class="card-body">
                     <h5 class="fw-bold text-primary mb-3"><i data-lucide="target" class="me-2"></i>Wyniki Analizy</h5>
                     <div class="mb-2 small text-muted">POTENCJAŁ PIKU (Ep)</div>
-                    <div class="h4 fw-bold text-dark">{{ measurement.peak_potential|floatformat:4 }} V</div>
+                    <div class="h4 fw-bold text-dark">{{ measurement.peak_potelntial|floatformat:4 }} V</div>
                     <hr>
                     <div class="mb-2 small text-muted">NATĘŻENIE PIKU (Ip)</div>
                     <div class="h4 fw-bold text-dark">{{ measurement.peak_current|scientific }} A</div>
                 </div>
             </div>
             
-            <a href="{{ measurement.raw_file.url }}" class="btn btn-outline-secondary w-100 mb-2">
-                <i data-lucide="download" class="me-2" style="width:16px"></i> Pobierz .DTA (Raw)
+            {% if measurement.raw_file %}
+            <a href="{{ measurement.raw_file.url }}"
+            class="btn btn-outline-secondary w-100 mb-2">
+
+                <i data-lucide="download"
+                class="me-2"
+                style="width:16px"></i>
+
+                Pobierz .DTA (Raw)
             </a>
+            {% endif %}
             {% if measurement.csv_file %}
             <a href="{{ measurement.csv_file.url }}" class="btn btn-success w-100">
                 <i data-lucide="file-spreadsheet" class="me-2" style="width:16px"></i> Pobierz .CSV

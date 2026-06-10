@@ -190,4 +190,125 @@ def test_requires_login(self):
     response = self.client.post(reverse("create_structure"))
 
     self.assertEqual(response.status_code, 302)  # redirect do login
+
+#testy dla okna edycji projektu i tworzenia pomiaru z poziomu projektu
+class ProjectViewsTest(TestCase):
+
+    def setUp(self):
+
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='test123'
+        )
+
+        self.client.login(
+            username='testuser',
+            password='test123'
+        )
+
+        self.project = Project.objects.create(
+            name='Projekt Testowy',
+            description='Opis projektu'
+        )
+
+        self.project.members.add(self.user)
+
+        self.biomarker = Biomarker.objects.create(
+            name='CRP',
+            project=self.project
+        )
+
+        self.electrode = Electrode.objects.create(
+            label='E1',
+            biomarker=self.biomarker
+        )
+
+    def test_project_edit_page_loads(self):
+
+        url = reverse(
+            'project_edit',
+            args=[self.project.id]
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(
+            response,
+            'Edycja projektu'
+        )
+
+    def test_project_edit_updates_data(self):
+
+        url = reverse(
+            'project_edit',
+            args=[self.project.id]
+        )
+
+        response = self.client.post(url, {
+            'name': 'Nowa nazwa',
+            'description': 'Nowy opis'
+        })
+
+        self.assertRedirects(
+            response,
+            reverse(
+                'project_detail',
+                args=[self.project.id]
+            )
+        )
+
+        self.project.refresh_from_db()
+
+        self.assertEqual(
+            self.project.name,
+            'Nowa nazwa'
+        )
+
+        self.assertEqual(
+            self.project.description,
+            'Nowy opis'
+        )
+
+    def test_measurement_create(self):
+
+        url = reverse(
+            'measurement_create',
+            args=[self.project.id]
+        )
+
+        response = self.client.post(url, {
+            'electrode': self.electrode.id,
+            'technique': 'DPV',
+            'date_performed': '2026-05-26',
+        })
+
+        self.assertEqual(
+            response.status_code,
+            302
+        )
+
+    def test_measurement_create_wrong_project(self):
+
+        other_project = Project.objects.create(
+            name='Inny projekt'
+        )
+
+        url = reverse(
+            'measurement_create',
+            args=[other_project.id]
+        )
+
+        response = self.client.post(url, {
+            'electrode': self.electrode.id,
+            'technique': 'DPV',
+            'date_performed': '2026-05-26',
+        })
+
+        self.assertEqual(
+            Measurement.objects.count(),
+            0
+        )
+
 # Create your tests here.

@@ -11,4 +11,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path("create/", views.create_structure, name="create_structure"),
     path("projects/<int:pk>/edit/", views.project_edit, name="project_edit"),
+    path('projects/<int:project_id>/measurements/create/', views.measurement_create, name='measurement_create'),
 ]

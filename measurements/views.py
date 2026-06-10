@@ -42,6 +42,7 @@ def dashboard(request):
         'project_form': project_form,
         'biomarker_form': biomarker_form,
         'electrode_form': electrode_form,
+        'measurement_choices': Measurement.TECHNIQUES,
     }
     return render(request, 'measurements/dashboard.html', context)
 
@@ -53,6 +54,7 @@ def project_detail(request, pk):
     return render(request, 'measurements/project_detail.html', {
         'project': project,
         'electrodes': electrodes,
+        'measurement_choices': Measurement.TECHNIQUES,
     })
 
 # @login_required
@@ -210,3 +212,37 @@ def project_edit(request, pk):
         'form': form,
         'project': project
     })
+
+def measurement_create(request, project_id):
+
+    project = get_object_or_404(
+        Project,
+        pk=project_id
+    )
+
+    if request.method == 'POST':
+
+        electrode = get_object_or_404(
+            Electrode,
+            pk=request.POST.get('electrode')
+        )
+
+        # zabezpieczenie projektu
+        if electrode.biomarker.project != project:
+
+            return redirect(
+                'project_detail',
+                pk=project.id
+            )
+
+        Measurement.objects.create(
+            electrode=electrode,
+            technique=request.POST.get('technique'),
+            date_performed=request.POST.get('date_performed'),
+            raw_file=request.FILES.get('raw_file'),
+        )
+
+    return redirect(
+        'project_detail',
+        pk=project.id
+    )
