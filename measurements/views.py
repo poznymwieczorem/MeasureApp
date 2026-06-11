@@ -88,10 +88,15 @@ def project_detail(request, pk):
     biomarker_form = BiomarkerForm()
     electrode_form = ElectrodeForm()
 
+    all_electrodes = Electrode.objects.exclude(pk__in=project.electrodes.all())
+    all_biomarkers = Biomarker.objects.exclude(pk__in=project.biomarkers.all())
+
     return render(request, 'measurements/project_detail.html', {
         'project': project,
         'electrodes': project.electrodes.all(),
         'biomarkers': project.biomarkers.all(),
+        'all_electrodes': all_electrodes,
+        'all_biomarkers': all_biomarkers,
         'page_obj': page_obj,
         'measurement_choices': Measurement.TECHNIQUES,
         'search_form': search_form,
@@ -118,27 +123,34 @@ def remove_biomarker_from_project(request, pk, biomarker_id):
 
 @login_required
 def add_electrode_to_project(request, pk):
-    """Zmiana 7: Dodanie elektrody do istniejącego projektu."""
     project = get_object_or_404(Project, pk=pk)
     if request.method == 'POST':
-        form = ElectrodeForm(request.POST)
-        if form.is_valid():
-            electrode = form.save()
+        existing_id = request.POST.get('existing_electrode')
+        if existing_id:
+            electrode = get_object_or_404(Electrode, pk=existing_id)
             electrode.projects.add(project)
+        else:
+            form = ElectrodeForm(request.POST)
+            if form.is_valid():
+                electrode = form.save()
+                electrode.projects.add(project)
     return redirect('project_detail', pk=pk)
 
 
 @login_required
 def add_biomarker_to_project(request, pk):
-    """Zmiana 7: Dodanie biomarkera do istniejącego projektu."""
     project = get_object_or_404(Project, pk=pk)
     if request.method == 'POST':
-        form = BiomarkerForm(request.POST)
-        if form.is_valid():
-            biomarker = form.save()
+        existing_id = request.POST.get('existing_biomarker')
+        if existing_id:
+            biomarker = get_object_or_404(Biomarker, pk=existing_id)
             biomarker.projects.add(project)
+        else:
+            form = BiomarkerForm(request.POST)
+            if form.is_valid():
+                biomarker = form.save()
+                biomarker.projects.add(project)
     return redirect('project_detail', pk=pk)
-
 
 @login_required
 def export_project_csv(request, pk):

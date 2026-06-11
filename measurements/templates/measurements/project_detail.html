@@ -237,7 +237,7 @@
     </div>
 </div>
 
-<!-- Zmiana 7: Modal dodaj elektrodę -->
+<!-- Modal dodaj elektrodę -->
 <div class="modal fade" id="addElectrodeModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -248,13 +248,37 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Etykieta elektrody</label>
-                        {{ electrode_form.label }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Materiał <span class="text-muted">(opcjonalnie)</span></label>
-                        {{ electrode_form.material }}
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#existingElectrode" type="button">Wybierz istniejącą</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#newElectrode" type="button">Utwórz nową</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="existingElectrode">
+                            {% if all_electrodes %}
+                            <select name="existing_electrode" class="form-select">
+                                <option value="">-- Wybierz elektrodę --</option>
+                                {% for e in all_electrodes %}
+                                <option value="{{ e.id }}">{{ e.label }}{% if e.material %} ({{ e.material }}){% endif %}</option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <p class="text-muted small">Wszystkie elektrody są już przypisane do tego projektu.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="newElectrode">
+                            <div class="mb-3">
+                                <label class="form-label">Etykieta elektrody</label>
+                                {{ electrode_form.label }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Materiał <span class="text-muted">(opcjonalnie)</span></label>
+                                {{ electrode_form.material }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -266,7 +290,7 @@
     </div>
 </div>
 
-<!-- Zmiana 7: Modal dodaj biomarker -->
+<!-- Modal dodaj biomarker -->
 <div class="modal fade" id="addBiomarkerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -277,9 +301,33 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Nazwa biomarkera</label>
-                        {{ biomarker_form.name }}
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#existingBiomarker" type="button">Wybierz istniejący</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#newBiomarker" type="button">Utwórz nowy</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="existingBiomarker">
+                            {% if all_biomarkers %}
+                            <select name="existing_biomarker" class="form-select">
+                                <option value="">-- Wybierz biomarker --</option>
+                                {% for b in all_biomarkers %}
+                                <option value="{{ b.id }}">{{ b.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <p class="text-muted small">Wszystkie biomarkery są już przypisane do tego projektu.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="newBiomarker">
+                            <div class="mb-3">
+                                <label class="form-label">Nazwa biomarkera</label>
+                                {{ biomarker_form.name }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -291,5 +339,14 @@
     </div>
 </div>
 
-<script>lucide.createIcons();</script>
+<script>
+document.querySelectorAll('#addElectrodeModal form, #addBiomarkerModal form').forEach(form => {
+    form.addEventListener('submit', () => {
+        form.querySelectorAll('.tab-pane:not(.active) input, .tab-pane:not(.active) select').forEach(el => {
+            el.disabled = true;
+        });
+    });
+});
+lucide.createIcons();
+</script>
 {% endblock %}
