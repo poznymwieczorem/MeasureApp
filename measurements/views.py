@@ -48,6 +48,9 @@ def dashboard(request):
         'biomarker_form': biomarker_form,
         'electrode_form': electrode_form,
         'measurement_choices': Measurement.TECHNIQUES,
+        'all_electrodes': Electrode.objects.all(),
+        'all_biomarkers': Biomarker.objects.all(),
+
     }
     return render(request, 'measurements/dashboard.html', context)
 
@@ -280,7 +283,6 @@ def activate(request, uidb64, token):
 
 @login_required
 def create_structure(request):
-    """Zmiana 4: Dynamiczny formularz — tworzy projekt + dowolną liczbę biomarkerów i elektrod."""
     if request.method == "POST":
         project_form = ProjectForm(request.POST, prefix="project")
 
@@ -288,7 +290,16 @@ def create_structure(request):
             project = project_form.save()
             project.members.add(request.user)
 
-            # Dynamiczne listy biomarkerów
+            # Istniejące biomarkery (checkboxy)
+            existing_biomarker_ids = request.POST.getlist('existing_biomarker_ids[]')
+            for bid in existing_biomarker_ids:
+                try:
+                    biomarker = Biomarker.objects.get(pk=bid)
+                    biomarker.projects.add(project)
+                except Biomarker.DoesNotExist:
+                    pass
+
+            # Nowe biomarkery
             biomarker_names = request.POST.getlist('biomarker_names[]')
             for name in biomarker_names:
                 name = name.strip()
@@ -296,7 +307,16 @@ def create_structure(request):
                     biomarker = Biomarker.objects.create(name=name)
                     biomarker.projects.add(project)
 
-            # Dynamiczne listy elektrod
+            # Istniejące elektrody (checkboxy)
+            existing_electrode_ids = request.POST.getlist('existing_electrode_ids[]')
+            for eid in existing_electrode_ids:
+                try:
+                    electrode = Electrode.objects.get(pk=eid)
+                    electrode.projects.add(project)
+                except Electrode.DoesNotExist:
+                    pass
+
+            # Nowe elektrody
             electrode_labels = request.POST.getlist('electrode_labels[]')
             electrode_materials = request.POST.getlist('electrode_materials[]')
             for i, label in enumerate(electrode_labels):
