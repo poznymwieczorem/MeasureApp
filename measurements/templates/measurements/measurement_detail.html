@@ -6,7 +6,9 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'project_detail' measurement.electrode.biomarker.project.id %}">{{ measurement.electrode.biomarker.project.name }}</a></li>
+            {% if measurement.project %}
+            <li class="breadcrumb-item"><a href="{% url 'project_detail' measurement.project.id %}">{{ measurement.project.name }}</a></li>
+            {% endif %}
             <li class="breadcrumb-item active">Pomiar #{{ measurement.id }}</li>
         </ol>
     </nav>
