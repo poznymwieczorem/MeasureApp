@@ -262,8 +262,8 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 
 # ── reCAPTCHA ────────────────────────────────────────────────────────
-RECAPTCHA_PUBLIC_KEY = '6LcnTKosAAAAADxtjqnZhTNb1U8pCgHF733NsGQ0'
-RECAPTCHA_PRIVATE_KEY = '6LcnTKosAAAAALpFqjQeku2YYTmHps4sVmFsSCLX'
+RECAPTCHA_PUBLIC_KEY = '6Ld16BotAAAAAIGhxk5m0O4IHSUjBSAmR6_4ZVV_'
+RECAPTCHA_PRIVATE_KEY = '6Ld16BotAAAAAKC3kNHV1Jaj__OxSGWxNVlxTj16'
 
 
 # ── Email ────────────────────────────────────────────────────────────
