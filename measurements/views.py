@@ -24,6 +24,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from django.core import settings
 
 
 @login_required
@@ -239,27 +240,35 @@ def measurement_detail(request, pk):
         'plot_div': plot_div,
     })
 
-
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False
-            user.save()
 
-            current_site = get_current_site(request)
-            mail_subject = 'Aktywuj swoje konto w MeasureLapp'
-            message = render_to_string('registration/acc_active_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-            })
-            to_email = form.cleaned_data.get('email')
-            email = EmailMessage(mail_subject, message, to=[to_email])
-            email.send()
-            return render(request, 'registration/check_email.html')
+            if settings.REQUIRE_EMAIL_VERIFICATION:
+                # Wersja lokalna: konto nieaktywne, link aktywacyjny mailem
+                user.is_active = False
+                user.save()
+
+                current_site = get_current_site(request)
+                mail_subject = 'Aktywuj swoje konto w MeasureLapp'
+                message = render_to_string('registration/acc_active_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                })
+                to_email = form.cleaned_data.get('email')
+                email = EmailMessage(mail_subject, message, to=[to_email])
+                email.send()
+                return render(request, 'registration/check_email.html')
+            else:
+                # Wersja produkcyjna (Render, brak SMTP): konto od razu aktywne
+                user.is_active = True
+                user.save()
+                messages.success(request, 'Konto utworzone! Możesz się zalogować.')
+                return redirect('login')
     else:
         form = RegisterForm()
     return render(request, 'registration/register.html', {'form': form})

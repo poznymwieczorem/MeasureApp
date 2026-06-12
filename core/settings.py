@@ -267,6 +267,12 @@ RECAPTCHA_PRIVATE_KEY = '6Ld16BotAAAAAKC3kNHV1Jaj__OxSGWxNVlxTj16'
 
 
 # ── Email ────────────────────────────────────────────────────────────
+
+# Czy weryfikacja konta przez email jest wymagana.
+# Lokalnie = True (działa, mail leci do konsoli).
+# Na Renderze = False (SMTP zablokowany na darmowym planie).
+REQUIRE_EMAIL_VERIFICATION = os.environ.get('REQUIRE_EMAIL_VERIFICATION', 'True') == 'True'
+
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Do produkcji odkomentuj i ustaw zmienne środowiskowe na Renderze:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
